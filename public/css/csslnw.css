@@ -1,0 +1,108 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+body {
+  font-family: Arial, sans-serif; /* เลือกฟอนต์ */
+    background-color: #dddddde3; /* สีพื้นหลังของหน้าเว็บ */
+    margin: 0; /* กำหนดให้ไม่มีระยะขอบรอบทั้งหน้าเว็บ */
+    padding: 0; /* ลบระยะห่างภายในของ Body */
+    justify-content: center; /* จัดเนื้อหาตรงกลางของหน้าเว็บ */
+    align-items: center; /* จัดเนื้อหาตรงกลางของหน้าเว็บ */
+}
+.container-top{
+    width: 90%;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background: #292828;
+    border-radius: 10px;
+    box-shadow: 0 30px 50px rgba(0,0,0,.2);
+}
+  
+  .box {
+    width: 7%;
+    border: 3px solid #cbcbcb;
+    border-radius: .5em;
+    padding: 10px;
+    cursor: move;
+    color: #cbcbcb;
+    margin: 3px;
+    font-size: 18px;
+    background-color: #1a1d2c;
+  }
+  .box.over {
+    border: 3px dotted #666;
+  }
+
+  #container-boxes{
+    justify-content: center;
+    display: flex;
+    width: 70%;
+    min-height: 60px;
+    margin: 5px;
+    padding: 5px;
+    border: 2px dashed #aeaeae;
+}
+.container-center{
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.graph_{
+    width: 65%;
+    margin-top: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 30px 50px rgba(0,0,0,.2);
+}
+
+#chart {
+  background-color: #a5adc700;
+  width: 95%;
+  margin: auto;
+  border-radius: .10em;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
+}
+
+.confirm-button, .reset-button {
+  padding: 10px 20px; /* ขนาดของปุ่ม */
+  font-size: 16px; /* ขนาดตัวอักษร */
+  border: none; /* ไม่มีเส้นขอบ */
+  border-radius: 5px; /* กำหนดเส้นขอบโค้ง */
+  cursor: pointer; /* เปลี่ยนเคอร์เซอร์เป็นรูปแบบของมือ */
+  transition: background-color 0.3s ease; /* เพิ่มการเคลื่อนไหวเมื่อ hover */
+}
+
+.confirm-button {
+  background-color: #4CAF50; /* สีพื้นหลังปุ่มยืนยัน */
+  color: white; /* สีข้อความปุ่มยืนยัน */
+  height: 75px;
+}
+
+.reset-button {
+  background-color: #3652f4; /* สีพื้นหลังปุ่มรีเซ็ต */
+  color: white; /* สีข้อความปุ่มรีเซ็ต */
+  height: 75px;
+}
+
+.confirm-button:hover, .reset-button:hover {
+  opacity: 0.8; /* เพิ่มความทึบของปุ่มเมื่อโฮเวอร์ */
+}
+
+.be-text {
+  font-family: 'Arial', sans-serif; /* เลือกฟอนต์ */
+  font-size: 48px; /* ขนาดตัวอักษร */
+  color: #cbcbcb; /* สีข้อความ */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* เพิ่มเงาใต้ข้อความ */
+  letter-spacing: 2px; /* ระยะห่างระหว่างตัวอักษร */
+  text-align: center; /* การจัดวางตำแหน่งข้อความ */
+}

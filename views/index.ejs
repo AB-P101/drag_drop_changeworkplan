@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/csslnw.css" />
+    <script src="./src/apexchart_.js"></script>
+    <title>Gantt Chart</title>
+  </head>
+  <body>
+    <div class="container-top">
+      <h1 class="be-text">ข้อมูล:</h1>
+
+      <div id="container-boxes"></div>
+      <script>
+        let data_num = 11;
+        let data_set = [
+          "1L",
+          "1R",
+          "2",
+          "3",
+          "6_1LR",
+          "6-2LR",
+          "6-3LR",
+          "6-4LR",
+          "7-1",
+          "7-2",
+          "8",
+        ];
+        let data_curr = [];
+        var curOrder = [
+          parseInt("<%= dataPlane[0].p_1L%>"),
+          parseInt("<%= dataPlane[0].p_1R%>"),
+          parseInt("<%= dataPlane[0].p_2%>"),
+          parseInt("<%= dataPlane[0].p_3%>"),
+          parseInt("<%= dataPlane[0].p_6_1LR%>"),
+          parseInt("<%= dataPlane[0].p_6_2LR%>"),
+          parseInt("<%= dataPlane[0].p_6_3LR%>"),
+          parseInt("<%= dataPlane[0].p_6_4LR%>"),
+          parseInt("<%= dataPlane[0].p_7_1%>"),
+          parseInt("<%= dataPlane[0].p_7_2%>"),
+          parseInt("<%= dataPlane[0].p_8%>"),
+        ];
+        let data_position = curOrder;
+        let currentElement = "";
+        let list = document.getElementById("container-boxes");
+        let initialX = 0,
+          initialY = 0;
+
+        const isTouchDevice = () => {
+          try {
+            document.createEvent("TouchEvent");
+            return true;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        //Create List Items
+        const creator = (count) => {
+          for (let i = 1; i <= count; i++) {
+            list.innerHTML += `<div class="box" id ="${i} "data-value ="${
+              curOrder[i - 1]
+            }">${data_set[curOrder[i - 1] - 1]} </div>`;
+          }
+        };
+
+        //Returns element index with given value
+        const getPosition = (value) => {
+          let elementIndex;
+          let listItems = document.querySelectorAll(".box");
+          listItems.forEach((element, index) => {
+            let elementValue = element.getAttribute("data-value");
+            if (value == elementValue) {
+              elementIndex = index;
+            }
+          });
+          return elementIndex;
+        };
+
+        //Drag and drop functions
+        function dragStart(e) {
+          initialX = isTouchDevice() ? e.touches[0].clientX : e.clientX;
+          initialY = isTouchDevice() ? e.touches[0].clientY : e.clientY;
+          //Set current Element
+          currentElement = e.target;
+        }
+        function dragOver(e) {
+          e.preventDefault();
+        }
+
+        const drop = (e) => {
+          e.preventDefault();
+          let newX = isTouchDevice() ? e.touches[0].clientX : e.clientX;
+          let newY = isTouchDevice() ? e.touches[0].clientY : e.clientY;
+
+          //Set targetElement(where we drop the picked element).It is based on mouse position
+          let targetElement = document.elementFromPoint(newX, newY);
+          let currentValue = currentElement.getAttribute("data-value");
+          let targetValue = targetElement.getAttribute("data-value");
+          //get index of current and target based on value
+          let [currentPosition, targetPosition] = [
+            getPosition(currentValue),
+            getPosition(targetValue),
+          ];
+          initialX = newX;
+          initialY = newY;
+
+          var posi = [0, 0];
+          for (var i = 0; i < 11; i++) {
+            if (currentValue == data_position[i]) {
+              posi[0] = i;
+            } else if (targetValue == data_position[i]) {
+              posi[1] = i;
+            }
+          }
+
+          data_position.splice(posi[1], 0, data_position.splice(posi[0], 1)[0]);
+
+          console.log(data_position);
+          console.log(posi);
+          console.log(data_position);
+
+          try {
+            //'afterend' inserts the element after the target element and 'beforebegin' inserts before the target element
+            if (currentPosition < targetPosition) {
+              targetElement.insertAdjacentElement("afterend", currentElement);
+            } else {
+              targetElement.insertAdjacentElement(
+                "beforebegin",
+                currentElement
+              );
+            }
+          } catch (err) {}
+        };
+
+        window.onload = async () => {
+          customElement = "";
+          list.innerHTML = "";
+          //This creates 5 elements
+          await creator(data_num);
+
+          let listItems = document.querySelectorAll(".box");
+          listItems.forEach((element) => {
+            element.draggable = true;
+            element.addEventListener("dragstart", dragStart, false);
+            element.addEventListener("dragover", dragOver, false);
+            element.addEventListener("drop", drop, false);
+            element.addEventListener("touchstart", dragStart, false);
+            element.addEventListener("touchmove", drop, false);
+          });
+        };
+      </script>
+      <div class="button-container">
+        <button class="confirm-button" onclick="insertData()">ยืนยัน</button>
+        <button class="reset-button" onclick="resetPage()">รีเซ็ต</button>
+        <button class="reset-button" onclick="flexsimPage()">FlexSim</button>
+      </div>
+    </div>
+
+    <script>
+      function insertData() {
+        const data = { position: data_position };
+        fetch("/insertData", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.error("เกิดข้อผิดพลาด:", error));
+        console.log(data);
+        alert("ส่งข้อมูลแล้ว");
+        
+      }
+      function resetPage() {
+        window.location.href = window.location.href;
+      }
+      function flexsimPage() {
+        window.open('http://127.0.0.1/');
+      }
+    </script>
+
+    <div class="graph_">
+      <div id="chart"></div>
+    </div>
+
+    <script>
+      var dataType = [];
+      var dataST = [];
+      var dataET = [];
+      var dataPS = [];
+      var index = 0;
+      ("<% if ( dataFlex.length > 0 ) { %>");
+      ("<% dataFlex.forEach ( function ( data, index ) { %>");
+      var st = "<%= data.StartTime %>";
+      var et = "<%= data.EndTime %>";
+      var datest = new Date(st);
+      var dateet = new Date(et);
+      dataType["<%= index %>"] = "<%= data.Type %>";
+      dataST["<%= index %>"] = (datest).getTime(); //"<%= data.StartTime %>";
+      dataET["<%= index %>"] = (dateet).getTime(); //"<%= data.EndTime %>";
+      dataPS["<%= index %>"] = "<%= data.Processor %>";
+      index = "<%= index %>";
+      ("<% } ); }%>");
+
+      //console.log(dataST[1]);
+
+      var txt = "[";
+      for (var i = 0; i <= index; i++) {
+        if (i < index) {
+          txt +=
+            "{" +
+            '"name"' +
+            ':"' +
+            dataType[i] +
+            '","data"' +
+            ":" +
+            '[{"x":"' +
+            dataPS[i] +
+            '","y":[' +
+            dataST[i] +
+            "," +
+            dataET[i] +
+            "]}]},";
+        } else {
+          txt +=
+            "{" +
+            '"name"' +
+            ':"' +
+            dataType[i] +
+            '","data"' +
+            ":" +
+            '[{"x":"' +
+            dataPS[i] +
+            '","y":[' +
+            dataST[i] +
+            "," +
+            dataET[i] +
+            "]}]}]";
+        }
+      }
+
+      var jsonTXT = JSON.parse(txt);
+      var groupedData = {};
+
+      jsonTXT.forEach((item) => {
+        if (!groupedData[item.name]) {
+          groupedData[item.name] = [];
+        }
+        if (Array.isArray(item.data)) {
+          item.data.forEach((elem) => {
+            if (typeof elem === "object" && !Array.isArray(elem)) {
+              groupedData[item.name].push(elem);
+            } else {
+              groupedData[item.name].push({ value: elem });
+            }
+          });
+        } else {
+          groupedData[item.name].push({ value: item.data });
+        }
+      });
+
+      var mergedData = Object.entries(groupedData).map(([name, data]) => ({
+        name,
+        data,
+      }));
+      mergedData.forEach((item) => {
+        item.data.sort((a, b) => a.y[0] - b.y[0]);
+      });
+      console.log(mergedData)
+
+      var options = {
+        series: mergedData,
+        chart: {
+          height: 650,
+          type: "rangeBar",
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+            barHeight: "100%",
+            rangeBarGroupRows: true,
+          },
+        },
+        colors: [
+          "#008FFB",
+          "#00E396",
+          "#FEB019",
+          "#FF4560",
+          "#775DD0",
+          "#3F51B5",
+          "#546E7A",
+          "#D4526E",
+          "#8D5B4C",
+          "#F86624",
+          "#D7263D",
+          "#1B998B",
+          "#2E294E",
+          "#F46036",
+          "#E2C044",
+        ],
+        fill: {
+          type: "solid",
+        },
+        xaxis: {
+          type: "datetime",
+        },
+        legend: {
+          position: "right",
+        },
+        tooltip: {
+          custom: function (opts) {
+           /* const fromYear = formatDate(new Date(opts.y1));
+            const toYear = formatDate(new Date(opts.y2));*/
+
+            const fromYear = formatDate(new Date(opts.y1));
+            const toYear = formatDate(new Date(opts.y2));
+            
+            function formatDate(date) {
+              const options = {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              };
+              return new Intl.DateTimeFormat("th-TH", options).format(date);
+            }
+
+            const w = opts.ctx.w;
+            let ylabel = w.globals.labels[opts.dataPointIndex];
+            let seriesName = w.config.series[opts.seriesIndex].name
+              ? w.config.series[opts.seriesIndex].name
+              : "";
+            const color = w.globals.colors[opts.seriesIndex];
+
+            function calculateTimeDifference(start, end) {
+              const startDate = new Date(start);
+              const endDate = new Date(end);
+
+              const difference = endDate.getTime() - startDate.getTime();
+              const daysDifference = Math.floor(
+                difference / (1000 * 60 * 60 * 24)
+              );
+              const hoursDifference = Math.floor(
+                (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+              );
+              const minutesDifference = Math.floor(
+                (difference % (1000 * 60 * 60)) / (1000 * 60)
+              );
+              const secondsDifference = Math.floor(
+                (difference % (1000 * 60)) / 1000 
+              );
+
+              const result = `${daysDifference} day : ${hoursDifference} hour : ${minutesDifference} min : ${secondsDifference} sec`;
+
+              return result;
+            }
+            const durations = calculateTimeDifference(fromYear, toYear);
+
+            return (
+              '<div class="apexcharts-tooltip-rangebar">' +
+              '<div> <span class="series-name" style="color: ' +
+              color +
+              '"> Type: ' +
+              (seriesName ? seriesName : "") +
+              "</span></div>" +
+              '<div> <span class="category"> Processor: ' +
+              ylabel +
+              '<br> </span> <span class="value start-value">Start-End: ' +
+              fromYear +
+              '</span> <span class="separator">-</span> <span class="value end-value">' +
+              toYear +
+              "<br>Duration: " +
+              durations +
+              "</span></div>" +
+              "</div>"
+            );
+          },
+        },
+      };
+
+      var chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
+    </script>
+  </body>
+</html>
